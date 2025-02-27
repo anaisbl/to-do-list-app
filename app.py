@@ -46,17 +46,22 @@ class toDoApp(QWidget):
 
         # input fields
         self.title_input = QLineEdit()
-        self.deadline_input = QLineEdit()
+        self.deadline_input = QTimeEdit()
         self.details_input = QLineEdit()
 
-        # Add a button to save the task
+        # add a button to save the task
         self.save_button = QPushButton("Save Task")
         self.save_button.clicked.connect(self.add_task)
+
+        # add button to cancel the task
+        self.cancel_button = QPushButton("Cancel")
+        self.cancel_button.clicked.connect(self.cancel_task)
 
         self.task_pageLayout.addRow("Title", self.title_input)
         self.task_pageLayout.addRow("Deadline", self.deadline_input)
         self.task_pageLayout.addRow("Details", self.details_input)
         self.task_pageLayout.addWidget(self.save_button)
+        self.task_pageLayout.addWidget(self.cancel_button)
 
         self.task_page.setLayout(self.task_pageLayout)
         self.stackedLayout.addWidget(self.task_page)
@@ -65,9 +70,25 @@ class toDoApp(QWidget):
         layout.addWidget(self.pageCombo)
         layout.addLayout(self.stackedLayout)
 
-
     def switchPage(self):
         self.stackedLayout.setCurrentIndex(self.pageCombo.currentIndex())
+
+    def cancel_task(self):
+        # clear input fields & return to home page
+        self.title_input.clear()
+        self.deadline_input.clear()
+        self.details_input.clear()
+        self.pageCombo.setCurrentIndex(0)  # Switch to Home page
+        self.stackedLayout.setCurrentIndex(0)   
+
+    def task_success_dialog(self):
+        # dialog box for user response
+        dlg = QMessageBox(self)
+        dlg.setWindowTitle("To List App")
+        dlg.setText("Task created!")
+        button = dlg.exec()
+        if button == QMessageBox.Ok:
+            print("OK!")
 
     def add_task(self):
         title = self.title_input.text()
@@ -80,6 +101,8 @@ class toDoApp(QWidget):
 
             # add task to task list on home page
             self.task_list.addItem(task)
+
+            self.task_success_dialog()
 
             # clear input fields & return to home page
             self.title_input.clear()
