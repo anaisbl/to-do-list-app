@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLineEdit, QVBoxLayout, QWidget, QListWidget
+from PyQt5.QtWidgets import *
 
 # core of every Qt app is the QApplication class
 # every app needs one QApplication object to function
@@ -13,31 +13,80 @@ class toDoApp(QWidget):
     def __init__(self):
         super().__init__()
 
+        # window size and title
         self.setWindowTitle("To do list")
         self.setGeometry(100,100,400,300)
 
+        # list to store tasks
         self.tasks = []
 
-        self.layout = QVBoxLayout()
+        # top level layout
+        layout = QVBoxLayout()
+        self.setLayout(layout)
 
-        self.input_field = QLineEdit()
-        self.add_button = QPushButton("Add Task")
-        self.task_list = QListWidget()
+        # button to switch to another page
+        self.pageCombo = QComboBox()
+        self.pageCombo.addItems(["Home", "Add Task"])
+        self.pageCombo.activated.connect(self.switchPage)
 
-        self.layout.addWidget(self.input_field)
-        self.layout.addWidget(self.add_button)
-        self.layout.addWidget(self.task_list)
+        # Create the stacked layout
+        self.stackedLayout = QStackedLayout()
 
-        self.add_button.clicked.connect(self.add_task)
+        # add home page
+        self.home_page = QWidget()
+        self.home_pageLayout = QVBoxLayout()
+        self.task_list = QListWidget()  # List to display tasks
+        self.home_pageLayout.addWidget(self.task_list)
+        self.home_page.setLayout(self.home_pageLayout)
+        self.stackedLayout.addWidget(self.home_page)
 
-        self.setLayout(self.layout)
-    
+        # add task page
+        self.task_page = QWidget()
+        self.task_pageLayout = QFormLayout()
+
+        # input fields
+        self.title_input = QLineEdit()
+        self.deadline_input = QLineEdit()
+        self.details_input = QLineEdit()
+
+        # Add a button to save the task
+        self.save_button = QPushButton("Save Task")
+        self.save_button.clicked.connect(self.add_task)
+
+        self.task_pageLayout.addRow("Title", self.title_input)
+        self.task_pageLayout.addRow("Deadline", self.deadline_input)
+        self.task_pageLayout.addRow("Details", self.details_input)
+        self.task_pageLayout.addWidget(self.save_button)
+
+        self.task_page.setLayout(self.task_pageLayout)
+        self.stackedLayout.addWidget(self.task_page)
+
+        # combo box & stacked layout to main layout
+        layout.addWidget(self.pageCombo)
+        layout.addLayout(self.stackedLayout)
+
+
+    def switchPage(self):
+        self.stackedLayout.setCurrentIndex(self.pageCombo.currentIndex())
+
     def add_task(self):
-        task = self.input_field.text()
-        if task:
+        title = self.title_input.text()
+        deadline = self.deadline_input.text()
+        details = self.details_input.text()
+
+        if title:
+            task = f"Title: {title}, Deadline: {deadline}, Details: {details}"
             self.tasks.append(task)
+
+            # add task to task list on home page
             self.task_list.addItem(task)
-            self.input_field.clear()
+
+            # clear input fields & return to home page
+            self.title_input.clear()
+            self.deadline_input.clear()
+            self.details_input.clear()
+            self.pageCombo.setCurrentIndex(0)  # Switch to Home page
+            self.stackedLayout.setCurrentIndex(0)        
     
 
 
