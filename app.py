@@ -1,5 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
+from home_page import HomePage
+from task_page import TaskPage
 
 # core of every Qt app is the QApplication class
 # every app needs one QApplication object to function
@@ -9,7 +11,7 @@ from PyQt5.QtWidgets import *
 
 # good approach is to subclass the main window and self contain its behavior
 
-class toDoApp(QWidget):
+class toDoApp(QMainWindow):
     def __init__(self):
         super().__init__()
 
@@ -20,96 +22,40 @@ class toDoApp(QWidget):
         # list to store tasks
         self.tasks = []
 
-        # top level layout
-        layout = QVBoxLayout()
-        self.setLayout(layout)
-
-        # button to switch to another page
-        self.pageCombo = QComboBox()
-        self.pageCombo.addItems(["Home", "Add Task"])
-        self.pageCombo.activated.connect(self.switchPage)
-
-        # Create the stacked layout
+        # create stacked layout and pass to task page
         self.stackedLayout = QStackedLayout()
 
-        # add home page
-        self.home_page = QWidget()
-        self.home_pageLayout = QVBoxLayout()
-        self.task_list = QListWidget()  # List to display tasks
-        self.home_pageLayout.addWidget(self.task_list)
-        self.home_page.setLayout(self.home_pageLayout)
+
+        # create homepage and task page and pass necessary things
+        self.home_page = HomePage(self.tasks)
+        self.task_page = TaskPage(self.home_page, self.tasks, self.stackedLayout)
         self.stackedLayout.addWidget(self.home_page)
-
-        # add task page
-        self.task_page = QWidget()
-        self.task_pageLayout = QFormLayout()
-
-        # input fields
-        self.title_input = QLineEdit()
-        self.deadline_input = QTimeEdit()
-        self.details_input = QLineEdit()
-
-        # add a button to save the task
-        self.save_button = QPushButton("Save Task")
-        self.save_button.clicked.connect(self.add_task)
-
-        # add button to cancel the task
-        self.cancel_button = QPushButton("Cancel")
-        self.cancel_button.clicked.connect(self.cancel_task)
-
-        self.task_pageLayout.addRow("Title", self.title_input)
-        self.task_pageLayout.addRow("Deadline", self.deadline_input)
-        self.task_pageLayout.addRow("Details", self.details_input)
-        self.task_pageLayout.addWidget(self.save_button)
-        self.task_pageLayout.addWidget(self.cancel_button)
-
-        self.task_page.setLayout(self.task_pageLayout)
         self.stackedLayout.addWidget(self.task_page)
 
-        # combo box & stacked layout to main layout
-        layout.addWidget(self.pageCombo)
+        # create and initialize nav buttons
+        self.home_button = QPushButton("Home")
+        self.add_task_button = QPushButton("Add task")
+
+        # connect buttons to switch pages
+        self.home_button.clicked.connect(self.switchHome)
+        self.add_task_button.clicked.connect(self.switchTask)
+
+        # Layout for main window
+        layout = QVBoxLayout()
+        layout.addWidget(self.home_button)
+        layout.addWidget(self.add_task_button)
         layout.addLayout(self.stackedLayout)
 
-    def switchPage(self):
-        self.stackedLayout.setCurrentIndex(self.pageCombo.currentIndex())
+        # set up the main window layout
+        central_widget = QWidget()
+        central_widget.setLayout(layout)
+        self.setCentralWidget(central_widget)
 
-    def cancel_task(self):
-        # clear input fields & return to home page
-        self.title_input.clear()
-        self.deadline_input.clear()
-        self.details_input.clear()
-        self.pageCombo.setCurrentIndex(0)  # Switch to Home page
-        self.stackedLayout.setCurrentIndex(0)   
+    def switchHome(self):
+        self.stackedLayout.setCurrentIndex(0)
 
-    def task_success_dialog(self):
-        # dialog box for user response
-        dlg = QMessageBox(self)
-        dlg.setWindowTitle("To List App")
-        dlg.setText("Task created!")
-        button = dlg.exec()
-        if button == QMessageBox.Ok:
-            print("OK!")
-
-    def add_task(self):
-        title = self.title_input.text()
-        deadline = self.deadline_input.text()
-        details = self.details_input.text()
-
-        if title:
-            task = f"Title: {title}, Deadline: {deadline}, Details: {details}"
-            self.tasks.append(task)
-
-            # add task to task list on home page
-            self.task_list.addItem(task)
-
-            self.task_success_dialog()
-
-            # clear input fields & return to home page
-            self.title_input.clear()
-            self.deadline_input.clear()
-            self.details_input.clear()
-            self.pageCombo.setCurrentIndex(0)  # Switch to Home page
-            self.stackedLayout.setCurrentIndex(0)        
+    def switchTask(self):
+        self.stackedLayout.setCurrentIndex(1)  
     
 
 
