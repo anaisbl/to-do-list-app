@@ -1,4 +1,6 @@
 from PyQt5.QtWidgets import *
+from datetime import datetime
+import sqlite3
 
 class TaskPage(QWidget):
     def __init__(self, home_page, tasks, stacked_layout):
@@ -16,6 +18,9 @@ class TaskPage(QWidget):
         # input fields
         self.title_input = QLineEdit()
         self.deadline_input = QTimeEdit()
+        self.deadline_calendar_widget = QCalendarWidget()
+        self.deadline_calendar_widget.setMinimumDate(datetime.today())
+        self.no_deadline_checkbox = QCheckBox("No deadline")
         self.details_input = QLineEdit()
 
         # button to save and cancel the task
@@ -50,16 +55,19 @@ class TaskPage(QWidget):
             print("OK!")
 
     def add_task(self):
-        """Add task to home page and clear fields."""
+        """Add task to home page, save to database, and clear fields."""
         title = self.title_input.text()
         deadline = self.deadline_input.text()
         details = self.details_input.text()
 
         if title:
-            # Combine details into one task string
+            # Combine details into one task string (optional for display purposes)
             task = f"Title: {title}, Deadline: {deadline}, Details: {details}"
 
-            # Add the task to the home page task list
+            # Save the task to the database
+            self.save_task_to_db(title, deadline, details)
+
+            # Add the task to the home page task list (if needed)
             self.home_page.add_task(task)
 
             # Show success dialog
@@ -72,3 +80,15 @@ class TaskPage(QWidget):
 
             # Go back to the home page
             self.stacked_layout.setCurrentIndex(0)
+
+    def save_task_to_db(self, title, deadline, details):
+        """Save the task into the database."""
+        db_name = "tasks.db"  # Your database name
+        with sqlite3.connect(db_name) as db:
+            cursor = db.cursor()
+
+            # Insert new task into the Tasks table
+            cursor.execute("""INSERT INTO Tasks (Title, Deadline, Details)
+                            VALUES (?, ?, ?)""", (title, deadline, details))
+            
+            db.commit()

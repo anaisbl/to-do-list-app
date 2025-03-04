@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import *
 from home_page import HomePage
 from task_page import TaskPage
+from init_db import create_new_db
 
 # core of every Qt app is the QApplication class
 # every app needs one QApplication object to function
@@ -14,6 +15,9 @@ from task_page import TaskPage
 class toDoApp(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        # Initialize the database (this will ensure it is created when the app starts)
+        create_new_db("tasks.db")
 
         # window size and title
         self.setWindowTitle("To do list")
