@@ -10,7 +10,7 @@ class TaskPage(QWidget):
         self.tasks = tasks  # to keep track of tasks
         self.stacked_layout = stacked_layout  # reference to stacked layout
 
-        # stacked layout is responsible for switching pagesn and we can use setcurrentindex correctly
+        # stacked layout is responsible for switching pages and we can use setcurrentindex correctly
 
         # layout
         self.layout = QFormLayout()
@@ -23,7 +23,13 @@ class TaskPage(QWidget):
         self.no_deadline_checkbox = QCheckBox("No deadline")
         self.details_input = QLineEdit()
 
-        # button to save and cancel the task
+        # group deadline input and checkbox in a horizontal layout
+        deadline_layout = QHBoxLayout()
+        deadline_layout.addWidget(self.deadline_calendar_widget)
+        deadline_layout.addWidget(self.deadline_input)
+        deadline_layout.addWidget(self.no_deadline_checkbox)
+
+        # buttons to save and cancel the task
         self.save_button = QPushButton("Save Task")
         self.save_button.clicked.connect(self.add_task)
         self.cancel_button = QPushButton("Cancel")
@@ -31,7 +37,7 @@ class TaskPage(QWidget):
 
         # add widgets to layout
         self.layout.addRow("Title", self.title_input)
-        self.layout.addRow("Deadline", self.deadline_input)
+        self.layout.addRow("Deadline", deadline_layout)
         self.layout.addRow("Details", self.details_input)
         self.layout.addWidget(self.save_button)
         self.layout.addWidget(self.cancel_button)
@@ -57,37 +63,42 @@ class TaskPage(QWidget):
     def add_task(self):
         """Add task to home page, save to database, and clear fields."""
         title = self.title_input.text()
-        deadline = self.deadline_input.text()
         details = self.details_input.text()
 
+        # handle deadline
+        if self.no_deadline_checkbox.isChecked():
+            deadline = "No deadline"
+        else:
+            selected_date = self.deadline_calendar_widget.selectedDate().toString("yyyy-MM-dd")
+            selected_time = self.deadline_input.time().toString("HH:mm")
+            deadline = f"{selected_date} {selected_time}"
+
         if title:
-            # Combine details into one task string (optional for display purposes)
-            task = f"Title: {title}, Deadline: {deadline}, Details: {details}"
+            # save the task to the database
+            self.save_task(title, deadline, details)
 
-            # Save the task to the database
-            self.save_task_to_db(title, deadline, details)
+            # add task to homepage
+            self.tasks.append((title, deadline, details))
 
-            # Add the task to the home page task list (if needed)
-            self.home_page.add_task(task)
+            # Refresh the HomePage display
+            self.home_page.update_task_list()
 
             # Show success dialog
             self.task_success_dialog()
 
-            # Clear input fields and return to home page
+            # Clear input fields and return to the home page
             self.title_input.clear()
             self.deadline_input.clear()
             self.details_input.clear()
-
-            # Go back to the home page
             self.stacked_layout.setCurrentIndex(0)
 
-    def save_task_to_db(self, title, deadline, details):
+
+    def save_task(self, title, deadline, details):
         """Save the task into the database."""
-        db_name = "tasks.db"  # Your database name
+        db_name = "tasks.db"
         with sqlite3.connect(db_name) as db:
             cursor = db.cursor()
-
-            # Insert new task into the Tasks table
+            # insert new task into the Tasks table
             cursor.execute("""INSERT INTO Tasks (Title, Deadline, Details)
                             VALUES (?, ?, ?)""", (title, deadline, details))
             

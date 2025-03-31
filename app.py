@@ -2,7 +2,8 @@ import sys
 from PyQt5.QtWidgets import *
 from home_page import HomePage
 from task_page import TaskPage
-from init_db import create_new_db
+from db import create_table
+import sqlite3
 
 # core of every Qt app is the QApplication class
 # every app needs one QApplication object to function
@@ -17,7 +18,7 @@ class toDoApp(QMainWindow):
         super().__init__()
 
         # Initialize the database (this will ensure it is created when the app starts)
-        create_new_db("tasks.db")
+        create_table()
 
         # window size and title
         self.setWindowTitle("To do list")
@@ -26,9 +27,11 @@ class toDoApp(QMainWindow):
         # list to store tasks
         self.tasks = []
 
+        # display records from db if any
+        self.grab_db()
+
         # create stacked layout and pass to task page
         self.stackedLayout = QStackedLayout()
-
 
         # create homepage and task page and pass necessary things
         self.home_page = HomePage(self.tasks)
@@ -60,6 +63,19 @@ class toDoApp(QMainWindow):
 
     def switchTask(self):
         self.stackedLayout.setCurrentIndex(1)  
+    
+    # grab all items from db
+    def grab_db(self):
+        db = sqlite3.connect('tasks.db')
+        cur = db.cursor()
+        cur.execute("SELECT Title, Deadline, Details FROM Tasks")
+        saved_tasks = cur.fetchall()
+        db.close()
+
+        self.tasks.extend(saved_tasks)
+
+
+
     
 
 

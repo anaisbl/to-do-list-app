@@ -1,0 +1,17 @@
+self.delete_button = QPushButton("Delete Task")
+self.task_list = QListWidget()
+
+self.layout.addWidget(self.input_field)
+self.layout.addWidget(self.add_button)
+self.layout.addWidget(self.delete_button)
+self.layout.addWidget(self.task_list)
+
+self.add_button.clicked.connect(self.add_task)
+self.delete_button.clicked.connect(self.delete_task)
+
+self.setLayout(self.layout)
+
+def delete_task(self):
+    selected_task = self.task_list.currentItem()
+    if selected_task:
+        self.task_list.takeItem(self.task_list.row(selected_task))
