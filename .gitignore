@@ -3,3 +3,5 @@ test.py
 tasks.db
 tasks.db
 *.db
+tasks.db
+*.db
