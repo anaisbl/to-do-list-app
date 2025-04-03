@@ -17,15 +17,12 @@ class TaskPage(QWidget):
 
         # input fields
         self.title_input = QLineEdit()
-        self.deadline_input = QTimeEdit()
-        self.deadline_calendar_widget = QCalendarWidget()
-        self.deadline_calendar_widget.setMinimumDate(datetime.today())
+        self.deadline_input = QCalendarWidget()
+        self.deadline_input.setMinimumDate(datetime.today())
         self.no_deadline_checkbox = QCheckBox("No deadline")
-        self.details_input = QLineEdit()
 
         # group deadline input and checkbox in a horizontal layout
         deadline_layout = QHBoxLayout()
-        deadline_layout.addWidget(self.deadline_calendar_widget)
         deadline_layout.addWidget(self.deadline_input)
         deadline_layout.addWidget(self.no_deadline_checkbox)
 
@@ -38,7 +35,6 @@ class TaskPage(QWidget):
         # add widgets to layout
         self.layout.addRow("Title", self.title_input)
         self.layout.addRow("Deadline", deadline_layout)
-        self.layout.addRow("Details", self.details_input)
         self.layout.addWidget(self.save_button)
         self.layout.addWidget(self.cancel_button)
 
@@ -47,8 +43,7 @@ class TaskPage(QWidget):
     def cancel_task(self):
         # clear input fields & return to home page
         self.title_input.clear()
-        self.deadline_input.clear()
-        self.details_input.clear()
+        self.deadline_input.setSelectedDate(self.deadline_input.minimumDate())
         self.stacked_layout.setCurrentIndex(0)   
 
     def task_success_dialog(self):
@@ -63,22 +58,20 @@ class TaskPage(QWidget):
     def add_task(self):
         """Add task to home page, save to database, and clear fields."""
         title = self.title_input.text()
-        details = self.details_input.text()
 
         # handle deadline
         if self.no_deadline_checkbox.isChecked():
             deadline = "No deadline"
         else:
-            selected_date = self.deadline_calendar_widget.selectedDate().toString("yyyy-MM-dd")
-            selected_time = self.deadline_input.time().toString("HH:mm")
-            deadline = f"{selected_date} {selected_time}"
+            selected_date = self.deadline_input.selectedDate().toString("dd-MM-yy")
+            deadline = f"{selected_date}"
 
         if title:
             # save the task to the database
-            self.save_task(title, deadline, details)
+            self.save_task(title, deadline)
 
             # add task to homepage
-            self.tasks.append((title, deadline, details))
+            self.tasks.append((title, deadline, "No", ""))
 
             # Refresh the HomePage display
             self.home_page.update_task_list()
@@ -88,18 +81,16 @@ class TaskPage(QWidget):
 
             # Clear input fields and return to the home page
             self.title_input.clear()
-            self.deadline_input.clear()
-            self.details_input.clear()
+            self.deadline_input.setSelectedDate(self.deadline_input.minimumDate())
             self.stacked_layout.setCurrentIndex(0)
 
-
-    def save_task(self, title, deadline, details):
+    def save_task(self, title, deadline):
         """Save the task into the database."""
         db_name = "tasks.db"
         with sqlite3.connect(db_name) as db:
             cursor = db.cursor()
-            # insert new task into the Tasks table
-            cursor.execute("""INSERT INTO Tasks (Title, Deadline, Details)
-                            VALUES (?, ?, ?)""", (title, deadline, details))
-            
+            # Insert new task into the Tasks table with Status and Completed fields
+            cursor.execute("""INSERT INTO Tasks (Title, Deadline, Status, Completed)
+                            VALUES (?, ?, ?, ?)""", (title, deadline, "No", ""))
             db.commit()
+

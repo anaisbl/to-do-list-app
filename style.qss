@@ -1,0 +1,17 @@
+QPushButton {
+    background-color: #FFD1DC; /* Light pastel pink */
+    color: #5A5A5A;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+}
+QPushButton:hover {
+    background-color: #FFC0CB; /* Slightly darker pink */
+}
+QTreeWidget {
+    background-color: #F3E5F5; /* Soft lavender */
+    alternate-background-color: #E1BEE7;
+    font-size: 14px;
+    color: #4A4A4A;
+}

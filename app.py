@@ -68,11 +68,20 @@ class toDoApp(QMainWindow):
     def grab_db(self):
         db = sqlite3.connect('tasks.db')
         cur = db.cursor()
-        cur.execute("SELECT Title, Deadline, Details FROM Tasks")
+        cur.execute("SELECT Title, Deadline, Status FROM Tasks")
         saved_tasks = cur.fetchall()
         db.close()
 
         self.tasks.extend(saved_tasks)
+
+    # load stylesheet
+    def load_stylesheet(app, filename):
+        with open(filename, "r") as file:
+            app.setStyleSheet(file.read())
+
+    app = QApplication(sys.argv)
+    qss_file = "style.qss"
+    load_stylesheet(app, qss_file)
 
 
 

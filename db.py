@@ -6,7 +6,7 @@ def create_table():
     db = sqlite3.connect('tasks.db')
     cur = db.cursor()
     cur.execute("""CREATE TABLE IF NOT EXISTS Tasks (
-            TaskID INTEGER PRIMARY KEY AUTOINCREMENT, Title TEXT NOT NULL, Deadline TEXT,        Details TEXT, Created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, Completed TIMESTAMP                         
+            TaskID INTEGER PRIMARY KEY AUTOINCREMENT, Title TEXT NOT NULL, Deadline TEXT, Created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, Status TEXT, Completed TIMESTAMP                         
         );""")
     
     db.close()
