@@ -68,7 +68,7 @@ class toDoApp(QMainWindow):
     def grab_db(self):
         db = sqlite3.connect('tasks.db')
         cur = db.cursor()
-        cur.execute("SELECT Title, Deadline, Status FROM Tasks")
+        cur.execute("SELECT Title, Deadline, Status, Completed FROM Tasks")
         saved_tasks = cur.fetchall()
         db.close()
 

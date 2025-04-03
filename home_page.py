@@ -33,43 +33,39 @@ class HomePage(QWidget):
         self.update_task_list()
 
     def update_task_list(self):
-        """Updates the task table with current tasks."""
+        """Updates the task table, excluding completed tasks."""
         self.task_table.setRowCount(0)  # Clear the table
+        row_counter = 0
         for row_index, task in enumerate(self.tasks):
-            # Ensure the task has all 4 fields; use default values if missing
-            if len(task) == 3:
-                title, deadline, status = task
-                completed = ""  # Default to empty string if 'completed' is missing
-            else:
-                title, deadline, status, completed = task
+            title, deadline, status, completed = task
 
-            self.task_table.insertRow(row_index)
+            # Only show tasks where status is "No" (not completed)
+            if status == "No":
+                self.task_table.insertRow(row_counter)
 
-            # Add title
-            self.task_table.setItem(row_index, 0, QTableWidgetItem(title))
+                # Add title
+                self.task_table.setItem(row_counter, 0, QTableWidgetItem(title))
 
-            # Add deadline
-            self.task_table.setItem(row_index, 1, QTableWidgetItem(deadline))
+                # Add deadline
+                self.task_table.setItem(row_counter, 1, QTableWidgetItem(deadline))
 
-            # Add checkbox for completion status
-            checkbox = QCheckBox()
-            checkbox.setChecked(status == "Yes")  # Mark as completed if status is "Yes"
-            checkbox.stateChanged.connect(lambda state, row=row_index: self.handle_status_change(state, row))
-            checkbox_widget = QWidget()
-            checkbox_layout = QHBoxLayout(checkbox_widget)
-            checkbox_layout.addWidget(checkbox)
-            checkbox_layout.setAlignment(Qt.AlignCenter)  # Center-align checkbox
-            checkbox_layout.setContentsMargins(0, 0, 0, 0)
-            self.task_table.setCellWidget(row_index, 2, checkbox_widget)
+                # Add checkbox for completion status
+                checkbox = QCheckBox()
+                checkbox.setChecked(False)  # Default to unchecked for incomplete tasks
+                checkbox.stateChanged.connect(lambda state, row=row_counter: self.handle_status_change(state, row))
+                checkbox_widget = QWidget()
+                checkbox_layout = QHBoxLayout(checkbox_widget)
+                checkbox_layout.addWidget(checkbox)
+                checkbox_layout.setAlignment(Qt.AlignCenter)  # Center-align checkbox
+                checkbox_layout.setContentsMargins(0, 0, 0, 0)
+                self.task_table.setCellWidget(row_counter, 2, checkbox_widget)
 
-            # Add completed timestamp
-            timestamp_item = QTableWidgetItem(completed)
-            self.task_table.setItem(row_index, 3, timestamp_item)
-
+                # Increment the visible row index
+                row_counter += 1
 
 
     def handle_status_change(self, state, row):
-        """Update task status and completion timestamp."""
+        """Update task status and refresh the table to hide completed tasks."""
         title = self.task_table.item(row, 0).text()
         deadline = self.task_table.item(row, 1).text()
 
@@ -81,13 +77,13 @@ class HomePage(QWidget):
             status = "No"
             completed = ""
 
-        # Update self.tasks
+        # Update the task in self.tasks
         for i, task in enumerate(self.tasks):
             if task[0] == title and task[1] == deadline:
                 self.tasks[i] = (title, deadline, status, completed)
                 break
 
-        # Update database
+        # Update the database
         db_name = "tasks.db"
         with sqlite3.connect(db_name) as db:
             cursor = db.cursor()
@@ -99,7 +95,7 @@ class HomePage(QWidget):
             )
             db.commit()
 
-        # Refresh task table
+        # Refresh the task table to hide completed tasks
         self.update_task_list()
 
     def modify_task(self):
