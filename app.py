@@ -22,7 +22,7 @@ class toDoApp(QMainWindow):
 
         # window size and title
         self.setWindowTitle("To do list")
-        self.setGeometry(100,100,400,300)
+        self.setGeometry(80,80,200,150)
 
         # list to store tasks
         self.tasks = []

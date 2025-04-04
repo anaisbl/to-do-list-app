@@ -1,17 +1,22 @@
+QMainWindow {
+    background-color:rgb(254, 225, 253);
+}
+
 QPushButton {
-    background-color: #FFD1DC; /* Light pastel pink */
-    color: #5A5A5A;
+    color: rgb(148, 79, 146);
     font-size: 14px;
     padding: 8px 12px;
     border-radius: 8px;
-    border: none;
+    border-color: rgb(148, 79, 146);
+    border-width: 1px;
+    border-style: solid;
 }
 QPushButton:hover {
-    background-color: #FFC0CB; /* Slightly darker pink */
+    background-color: rgb(148, 79, 146);
+    color:rgb(254, 225, 253);
 }
 QTreeWidget {
-    background-color: #F3E5F5; /* Soft lavender */
-    alternate-background-color: #E1BEE7;
+    background-color: rgb(254, 225, 253);
     font-size: 14px;
-    color: #4A4A4A;
+    color: rgb(148, 79, 146);
 }
