@@ -63,7 +63,6 @@ class HomePage(QWidget):
                 # Increment the visible row index
                 row_counter += 1
 
-
     def handle_status_change(self, state, row):
         """Update task status and refresh the table to hide completed tasks."""
         title = self.task_table.item(row, 0).text()
@@ -73,6 +72,7 @@ class HomePage(QWidget):
         if state == Qt.Checked:
             status = "Yes"
             completed = QDateTime.currentDateTime().toString("dd-MM-yyyy HH:mm")
+            self.task_complete_dialog()
         else:
             status = "No"
             completed = ""
@@ -97,6 +97,15 @@ class HomePage(QWidget):
 
         # Refresh the task table to hide completed tasks
         self.update_task_list()
+    
+    def task_complete_dialog(self):
+        # dialog box for user response
+        dlg = QMessageBox(self)
+        dlg.setWindowTitle("To List App")
+        dlg.setText("Task completed!")
+        button = dlg.exec()
+        if button == QMessageBox.Ok:
+            print("OK!")
 
     def modify_task(self):
         """Modify the selected task."""
