@@ -2,9 +2,78 @@ QMainWindow {
     background-color:rgb(254, 225, 253);
 }
 
+/* all buttons */
+QPushButton[button=true] {
+    color: rgb(148, 79, 146);
+    font-size: 18px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border-color: rgb(148, 79, 146);
+    border-width: 1px;
+    border-style: solid;
+}
+QPushButton[button=true]:hover {
+    background-color: rgb(148, 79, 146);
+    color:rgb(254, 225, 253);
+}
+
+/* icon buttons */
+QPushButton[button=false] {
+    color: rgb(148, 79, 146);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border-color: rgba(148, 79, 146, 0);
+    border-width: 1px;
+    border-style: solid;
+}
+QPushButton[button=false]:hover {
+    border-radius: 8px;
+    border-color: rgb(148, 79, 146);
+    border-width: 1px;
+    border-style: solid;
+}
+
+QTreeWidget {
+    background-color: rgb(254, 225, 253);
+    font-size: 14px;
+    color: rgb(148, 79, 146);
+}
+
+/* task table */
+QTableWidget {
+    background-color:rgb(251, 234, 251);
+    color: rgb(90, 53, 88);
+    gridline-color: white;
+    font-size: 18px;
+}
+QHeaderView::section {
+    background-color: rgb(251, 234, 251);
+    color: rgb(93, 28, 90);
+    font-weight: bold;
+    border: none;
+    font-size: 20px;
+}
+QHeaderView {
+    background-color:rgb(251, 234, 251);
+    color: white;
+    border: none;
+}
+
+/* new task form */
+QWidget#TaskCreationWindow {
+    background-color: rgb(254, 225, 253);
+}
+QTextEdit {
+    background-color: white;
+    border: 1px solid rgb(148, 79, 146);
+    border-radius: 4px;
+    padding: 4px;
+    font-size: 18px;
+    color: rgb(90, 53, 88);
+}
 QPushButton {
     color: rgb(148, 79, 146);
-    font-size: 14px;
+    font-size: 18px;
     padding: 8px 12px;
     border-radius: 8px;
     border-color: rgb(148, 79, 146);
@@ -14,9 +83,4 @@ QPushButton {
 QPushButton:hover {
     background-color: rgb(148, 79, 146);
     color:rgb(254, 225, 253);
-}
-QTreeWidget {
-    background-color: rgb(254, 225, 253);
-    font-size: 14px;
-    color: rgb(148, 79, 146);
 }
