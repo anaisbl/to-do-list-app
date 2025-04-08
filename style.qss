@@ -89,3 +89,13 @@ QTextEdit {
     font-size: 18px;
     color: rgb(90, 53, 88);
 }
+
+/* history page */
+QWidget#HistoryWindow {
+    background-color:rgb(251, 242, 234);
+    background-image: url("assets/bg.jpg");
+    background-position: center;
+}
+QTableWidget#HistoryWindow {
+    font-size: 22px;
+}

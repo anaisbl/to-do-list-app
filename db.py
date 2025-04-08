@@ -5,7 +5,6 @@ class DbInteraction:
     @staticmethod
     def create_table():
         """Sets up tables for new database"""
-
         db = sqlite3.connect('tasks.db')
         cur = db.cursor()
         cur.execute("""CREATE TABLE IF NOT EXISTS Tasks (
@@ -15,7 +14,7 @@ class DbInteraction:
         db.close()
     
     @staticmethod
-    def save_task(title, deadline, status="No", completed=""):
+    def save_task(title, deadline, status="Pending", completed=""):
         """Save a task into the database."""
         with sqlite3.connect('tasks.db') as db:
             cur = db.cursor()
@@ -28,10 +27,18 @@ class DbInteraction:
         
     @staticmethod
     def fetch_tasks():
-        """Fetch all tasks from the database."""
+        """Fetch all tasks, 4 cols from the database."""
         with sqlite3.connect('tasks.db') as db:
             cur = db.cursor()
             cur.execute("SELECT Title, Deadline, Status, Completed FROM Tasks")
+            return cur.fetchall()
+    
+    @staticmethod
+    def grab_all_history():
+         """"Fetch all tasks, all cols from db for the history view"""
+         with sqlite3.connect('tasks.db') as db:
+            cur = db.cursor()
+            cur.execute("SELECT Title, Deadline, Created, Status, Completed FROM Tasks")
             return cur.fetchall()
 
     @staticmethod
