@@ -29,22 +29,18 @@ class toDoApp(QMainWindow):
 
         # add font to font db
         font_path = "assets/font/IndieFlower-Regular.ttf"
-        font_id = QFontDatabase.addApplicationFont(font_path)
-        font_families = QFontDatabase.applicationFontFamilies(font_id)
-        print("Available font families:", font_families)
+        QFontDatabase.addApplicationFont(font_path)
 
-        # Window size and title
+        # window size + title
         self.setWindowTitle("Cute To-do list")
         self.setGeometry(80, 80, 700, 600)
 
-        # Create homepage
+        # create homepage
         self.home_page = HomePage()
 
-        # Layout for main window
+        # layout for main window
         layout = QVBoxLayout()
         layout.addWidget(self.home_page)
-
-        # Set main window layout
         central_widget = QWidget()
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
@@ -131,8 +127,8 @@ class HomePage(QWidget):
         self.add_task_button.setProperty("button", True)
 
         # alignment + size
-        self.add_task_button.setFixedWidth(200)  # Width in pixels
-        self.add_task_button.setFixedHeight(40)  # Height in pixels
+        self.add_task_button.setFixedWidth(200)
+        self.add_task_button.setFixedHeight(60)
 
         self.add_task_button.clicked.connect(self.open_task_creation_window)
         self.layout.addWidget(self.add_task_button, alignment=Qt.AlignLeft)
@@ -295,8 +291,9 @@ class HomePage(QWidget):
 class TaskCreationWindow(QWidget):
     def __init__(self, home_page):
         super().__init__()
-        self.home_page = home_page  # Reference to refresh task list after creation
+        self.home_page = home_page  # reference to refresh task list after creation
         self.setWindowTitle("Add new task")
+        self.setGeometry(150, 80, 400, 300)
         self.setObjectName("TaskCreationWindow")
 
         # layout
