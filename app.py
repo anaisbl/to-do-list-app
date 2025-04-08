@@ -2,7 +2,7 @@ import sys
 import getpass
 from datetime import datetime
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFontDatabase
 from PyQt5.QtCore import Qt, QDateTime, QTimer
 from db import DbInteraction
 
@@ -19,6 +19,7 @@ from db import DbInteraction
 class toDoApp(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setObjectName("MainWindow")
 
         # Initialize the database
         DbInteraction.create_table()
@@ -26,9 +27,15 @@ class toDoApp(QMainWindow):
         # stylesheet
         self.load_stylesheet("style.qss")
 
+        # add font to font db
+        font_path = "assets/font/IndieFlower-Regular.ttf"
+        font_id = QFontDatabase.addApplicationFont(font_path)
+        font_families = QFontDatabase.applicationFontFamilies(font_id)
+        print("Available font families:", font_families)
+
         # Window size and title
-        self.setWindowTitle("To-Do List")
-        self.setGeometry(80, 80, 680, 580)
+        self.setWindowTitle("Cute To-do list")
+        self.setGeometry(80, 80, 700, 600)
 
         # Create homepage
         self.home_page = HomePage()
@@ -51,6 +58,7 @@ class HomePage(QWidget):
     def __init__(self):
         super().__init__()
         self.layout = QVBoxLayout()
+        self.setObjectName("Homepage")
 
         # header section
         self.header_section()
@@ -75,20 +83,20 @@ class HomePage(QWidget):
         self.refresh_task_list()
 
     def header_section(self):
-        """Create a greeting section with the username and current date/time."""
-        username = getpass.getuser()  # Get the current user's name
-        current_date = datetime.now().strftime("%A, %d %B %Y")  # Format date nicely
-        current_time = datetime.now().strftime("%X")
+        """Create a greeting section with the username and current date+time and (wip) weather."""
+        username = getpass.getuser()  # get current user's name
+        current_date = datetime.now().strftime("%A, %d %B %Y") 
+        current_time = datetime.now().strftime("%H : %M : %S")
 
-        # Greeting label
+        # greeting label
         greeting_label = QLabel(f"Hey, {username}!")
-        greeting_label.setStyleSheet("font-size: 30px; font-weight: bold; color: rgb(93, 28, 90);")
+        greeting_label.setStyleSheet("font-family: Indie Flower; font-size: 40px; font-weight: 800; color: rgb(93, 28, 90);")
 
-        # Current date & time label
+        # current date & time label
         date_label = QLabel(f"Today is {current_date}.")
-        self.time_label = QLabel(f"It's currently {current_time}")
-        date_label.setStyleSheet("font-size: 16px; color: rgb(90, 53, 88);")
-        self.time_label.setStyleSheet("font-size: 16px; color: rgb(90, 53, 88);")
+        self.time_label = QLabel(f"It's currently {current_time} ")
+        date_label.setStyleSheet("font-family: Indie Flower; font-weight: 400; font-size: 28px; color: rgb(90, 53, 88);")
+        self.time_label.setStyleSheet("font-family: Indie Flower; font-weight: 400; font-size: 28px; color: rgb(90, 53, 88);")
         self.update_time()
 
         # current weather (initially empty) -- wip
@@ -96,27 +104,26 @@ class HomePage(QWidget):
         # self.weather_label.setStyleSheet("font-size: 16px; color: #555; text-decoration: underline; cursor: pointer;")
         # self.weather_label.mousePressEvent = self.prompt_city_input  # Attach click event
 
-        # Add these labels to a horizontal layout
+        # add labels to a vertical layout
         greeting_layout = QVBoxLayout()
         greeting_layout.addWidget(greeting_label, alignment=Qt.AlignLeft)
         # greeting_layout.addWidget(self.weather_label, alignment=Qt.AlignRight) - wip
         greeting_layout.addWidget(date_label, alignment=Qt.AlignLeft)
         greeting_layout.addWidget(self.time_label, alignment=Qt.AlignLeft)
 
-        # Add the greeting layout to the main layout
         greeting_widget = QWidget()
         greeting_widget.setLayout(greeting_layout)
         self.layout.addWidget(greeting_widget)
 
-        # Create a timer to update the time every second
+        # create a timer to update the time every second
         timer = QTimer(self)
-        timer.timeout.connect(self.update_time)  # Connect timer to update_time method
-        timer.start(1000)  # Update every 1000 milliseconds (1 second)
+        timer.timeout.connect(self.update_time)  # connect timer to update_time method
+        timer.start(1000)  # update every 1000 milliseconds 
     
     def update_time(self):
         """Update the time label with the current time."""
-        current_time = datetime.now().strftime("%X")  # Get the current time
-        self.time_label.setText(f"It's currently {current_time}.")
+        current_time = datetime.now().strftime("%H : %M : %S")  # get the current time
+        self.time_label.setText(f"It's currently {current_time}")
 
     def new_task_button(self):
         """Create the 'Add New Task' button and add it below the greeting section."""
@@ -138,7 +145,7 @@ class HomePage(QWidget):
 
     def refresh_task_list(self):
         """Refresh the task table, handle status changes, and exclude completed tasks."""
-        self.task_table.setRowCount(0)  # Clear the table
+        self.task_table.setRowCount(0)  # clear the table to avoid dups
         row_counter = 0
 
         #word wrap
@@ -154,18 +161,18 @@ class HomePage(QWidget):
             if status == "No":
                 # Add the task title with word wrap
                 task_item = QTableWidgetItem(title)
-                task_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)  # Align left for readability
+                task_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
                 self.task_table.insertRow(row_counter)
                 self.task_table.setItem(row_counter, 0, task_item)
 
                 # Add deadline
                 deadline_item = QTableWidgetItem(deadline)
-                deadline_item.setTextAlignment(Qt.AlignCenter)  # Center alignment
+                deadline_item.setTextAlignment(Qt.AlignCenter)
                 self.task_table.setItem(row_counter, 1, deadline_item)
 
                 # Add status
                 status_item = QTableWidgetItem(status)
-                status_item.setTextAlignment(Qt.AlignCenter)  # Center alignment
+                status_item.setTextAlignment(Qt.AlignCenter)
                 self.task_table.setItem(row_counter, 2, status_item)
 
                 # Add a checkbox for task completion
@@ -183,10 +190,12 @@ class HomePage(QWidget):
                 modify_button = QPushButton()
                 modify_button.setIcon(QIcon("assets/icons8-edit-64.png"))
                 modify_button.clicked.connect(lambda _, row=row_counter: self.modify_task(row))
+                modify_button.setProperty("button", False)
 
                 delete_button = QPushButton()
                 delete_button.setIcon(QIcon("assets/icons8-trash-can-64.png"))
                 delete_button.clicked.connect(lambda _, row=row_counter: self.delete_task(row))
+                delete_button.setProperty("button", False)
 
                 button_widget = QWidget()
                 button_layout = QHBoxLayout(button_widget)
@@ -283,7 +292,6 @@ class HomePage(QWidget):
             # refresh task table
             self.refresh_task_list()
 
-
 class TaskCreationWindow(QWidget):
     def __init__(self, home_page):
         super().__init__()
@@ -299,13 +307,15 @@ class TaskCreationWindow(QWidget):
         deadline_label = QLabel("Deadline: ")
 
         task_label.setStyleSheet("""
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 24px;
+            font-weight: 800;
+            font-family: 'Indie Flower';
             color: rgb(93, 28, 90);
         """)
         deadline_label.setStyleSheet("""
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 24px;
+            font-weight: 800;
+            font-family: 'Indie Flower';
             color: rgb(93, 28, 90);
         """)
 
@@ -326,18 +336,20 @@ class TaskCreationWindow(QWidget):
         # save + cancel buttons grouped as well
         self.save_button = QPushButton("Save Task")
         self.save_button.clicked.connect(self.save_task)
+        self.save_button.setProperty("button", True)
         self.save_button.setFixedWidth(180)
         self.save_button.setFixedHeight(40)
 
         self.cancel_button = QPushButton("Cancel")
         self.cancel_button.clicked.connect(self.close)
+        self.cancel_button.setProperty("button", True)
         self.cancel_button.setFixedHeight(40)
         self.cancel_button.setFixedWidth(180)
 
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.save_button)
         button_layout.addWidget(self.cancel_button)
-        button_layout.setAlignment(Qt.AlignCenter)
+        button_layout.setAlignment(Qt.AlignRight)
 
         # Add widgets to layout
         self.layout.addRow(task_label, self.title_input)
