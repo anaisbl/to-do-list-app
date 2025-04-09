@@ -33,7 +33,7 @@ class toDoApp(QMainWindow):
 
         # window size + title
         self.setWindowTitle("Cute To-do list")
-        self.setGeometry(80, 80, 700, 600)
+        self.setGeometry(80, 80, 680, 650)
 
         # create homepage
         self.home_page = HomePage()
@@ -63,15 +63,18 @@ class HomePage(QWidget):
         self.task_table = QTableWidget()
         self.task_table.setColumnCount(4)
         self.task_table.setHorizontalHeaderLabels(["Task", "Deadline", "Status", ""])
+        self.task_table.setColumnWidth(0, 220)
+        self.task_table.setColumnWidth(2 , 120)
+        self.task_table.setColumnWidth(3 , 100)
         self.layout.addWidget(self.task_table)
 
         self.setLayout(self.layout)
 
-        # Store reference to the task creation window
+        # store reference to the history & task creation window
         self.task_creation_window = None
         self.history_window = None
 
-        # Initial population of the task list
+        # initial population of the task list
         self.refresh_task_list()
 
     def header_section(self):
@@ -413,7 +416,7 @@ class HistoryWindow(QWidget):
         self.layout = QVBoxLayout()
         self.home_page = home_page  # reference to refresh task list after creation
         self.setWindowTitle("Task history")
-        self.setGeometry(150, 80, 900, 600)
+        self.setGeometry(150, 150, 900, 600)
         self.setObjectName("HistoryWindow")
 
         # header section
@@ -423,6 +426,7 @@ class HistoryWindow(QWidget):
         self.history_table = QTableWidget()
         self.history_table.setColumnCount(5)
         self.history_table.setHorizontalHeaderLabels(["Task", "Created on", "Due", "Status", "Complete on"])
+        self.history_table.setColumnWidth(0,200)
         self.layout.addWidget(self.history_table)
         self.setLayout(self.layout)
 
