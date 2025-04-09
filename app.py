@@ -2,7 +2,7 @@ import sys
 import getpass
 from datetime import datetime
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFontDatabase
+from PyQt5.QtGui import QIcon, QFontDatabase, QBrush, QColor
 from PyQt5.QtCore import Qt, QDateTime, QTimer, QSize
 from db import DbInteraction
 
@@ -216,6 +216,9 @@ class HomePage(QWidget):
                 button_layout.setAlignment(Qt.AlignCenter)
                 self.task_table.setCellWidget(row_counter, 3, button_widget)
 
+                # apply overdue styling
+                self.apply_overdue_styling(row_counter, deadline)
+
                 # increment the visible row index
                 row_counter += 1
             
@@ -241,6 +244,25 @@ class HomePage(QWidget):
 
         # Refresh the task table
         self.refresh_task_list()
+
+    def apply_overdue_styling(self, row_index, deadline):
+        """Apply styling to a task row if the deadline is overdue."""
+        try:
+            # parse the deadline
+            task_deadline = datetime.strptime(deadline, "%d-%m-%y")
+            
+            # check if the task is overdue & apply styling
+            if task_deadline < datetime.now():
+                for col in range(2):
+                    task_item = self.task_table.item(row_index, col)
+                    print(task_item)
+                    if task_item:
+                        font = task_item.font()
+                        font.setBold(True)
+                        task_item.setFont(font)
+                        task_item.setForeground(QBrush(QColor(255, 0, 0)))
+        except ValueError:
+            pass  # ignore invalid date formats
     
     def success_dialog(self, message):
         # dialog box for user response
