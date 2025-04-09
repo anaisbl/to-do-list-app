@@ -376,12 +376,14 @@ class TaskCreationWindow(QWidget):
         deadline = "No deadline" if self.no_deadline_checkbox.isChecked() else self.deadline_input.selectedDate().toString("dd-MM-yy")
 
         if title:
-            DbInteraction.save_task(title, deadline)  # Save to the database
-            self.home_page.refresh_task_list()       # Refresh tasks on the homepage
-            self.close()                             # Close the creation window
+            DbInteraction.save_task(title, deadline)
+            self.home_page.refresh_task_list()
+            self.close()
 
-            # Show success message
-            QMessageBox.information(self, "Success", "Task created successfully!")
+            # show success message
+            QMessageBox.information(self, "Success","Task created successfully!")
+        else:
+            QMessageBox.information(self, "Error", "Missing inputs!")
 
 class HistoryWindow(QWidget):
     def __init__(self, home_page):
@@ -567,8 +569,6 @@ class HistoryWindow(QWidget):
 
         # sort tasks by the parsed datetime object (earliest first)
         sorted_tasks.sort(key=lambda task: (task[0] is None, task[0] or datetime.max))
-        print(sorted_tasks)
-
         for deadline_date, title, creation, deadline, status, completed in sorted_tasks:
 
             if deadline_date != None:
@@ -587,7 +587,7 @@ class HistoryWindow(QWidget):
 
                 # add deadline
                 if deadline_date is not None:
-                    formatted_deadline = deadline_date.strftime("%d-%m-%y")
+                    formatted_deadline = deadline_date.strftime("%d-%m-%y") # back into string
                 else:
                     formatted_deadline = deadline
                 deadline_item = QTableWidgetItem(formatted_deadline)
