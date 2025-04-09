@@ -59,9 +59,6 @@ class HomePage(QWidget):
         # header section
         self.header_section()
 
-        # task button
-        self.new_task_button()
-
         # create task table
         self.task_table = QTableWidget()
         self.task_table.setColumnCount(4)
@@ -101,17 +98,32 @@ class HomePage(QWidget):
 
         # add labels to a vertical layout
         # greeting_layout.addWidget(self.weather_label, alignment=Qt.AlignRight) - wip
+        
         # history button
         self.hist_button = QPushButton()
         self.hist_button.setIcon(QIcon("assets/icons8-history-folder-64.png"))
         self.hist_button.setIconSize(QSize(40, 40))
         self.hist_button.setProperty("button", False)
+        self.hist_button.setToolTip("History")
         self.hist_button.clicked.connect(self.open_history_window)
+
+        # new task button
+        self.add_task_button = QPushButton()
+        self.add_task_button.setIcon(QIcon("assets/icons8-plus-sign-50.png"))
+        self.add_task_button.setIconSize(QSize(40, 40))
+        self.add_task_button.setProperty("button", False)
+        self.add_task_button.setToolTip("Add task")
+        self.add_task_button.clicked.connect(self.open_task_creation_window)
+
+        # group history & add task button
+        button_layout = QVBoxLayout()
+        button_layout.addWidget(self.hist_button, alignment=Qt.AlignRight)
+        button_layout.addWidget(self.add_task_button, alignment=Qt.AlignRight)
 
         # Horizontal layout for top-row alignment
         top_layout = QHBoxLayout()
         top_layout.addWidget(greeting_label, alignment=Qt.AlignLeft)
-        top_layout.addWidget(self.hist_button, alignment=Qt.AlignRight)
+        top_layout.addLayout(button_layout)
 
         # Vertical layout for the whole section
         main_layout = QVBoxLayout()
@@ -133,18 +145,6 @@ class HomePage(QWidget):
         """Update the time label with the current time."""
         current_time = datetime.now().strftime("%H : %M : %S")  # get the current time
         self.time_label.setText(f"It's currently {current_time}")
-
-    def new_task_button(self):
-        """Create the 'Add New Task' button and add it below the greeting section."""
-        self.add_task_button = QPushButton("Add New Task")
-        self.add_task_button.setProperty("button", True)
-
-        # alignment + size
-        self.add_task_button.setFixedWidth(200)
-        self.add_task_button.setFixedHeight(60)
-
-        self.add_task_button.clicked.connect(self.open_task_creation_window)
-        self.layout.addWidget(self.add_task_button, alignment=Qt.AlignLeft)
 
     def open_history_window(self):
         """Open the history window."""
@@ -188,6 +188,7 @@ class HomePage(QWidget):
                 # add a checkbox for task completion
                 checkbox = QCheckBox()
                 checkbox.setChecked(False)
+                checkbox.setToolTip("Mark complete")
                 checkbox.stateChanged.connect(lambda state, row=row_counter: self.handle_status_change(state, row))
                 checkbox_widget = QWidget()
                 checkbox_layout = QHBoxLayout(checkbox_widget)
@@ -201,11 +202,13 @@ class HomePage(QWidget):
                 modify_button.setIcon(QIcon("assets/icons8-edit-64.png"))
                 modify_button.clicked.connect(lambda _, row=row_counter: self.modify_task(row))
                 modify_button.setProperty("button", False)
+                modify_button.setToolTip("Edit task")
 
                 delete_button = QPushButton()
                 delete_button.setIcon(QIcon("assets/icons8-trash-can-64.png"))
                 delete_button.clicked.connect(lambda _, row=row_counter: self.delete_task(row))
                 delete_button.setProperty("button", False)
+                delete_button.setToolTip("Delete task")
 
                 button_widget = QWidget()
                 button_layout = QHBoxLayout(button_widget)
