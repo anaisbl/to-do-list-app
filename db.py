@@ -38,7 +38,7 @@ class DbInteraction:
          """"Fetch all tasks, all cols from db for the history view"""
          with sqlite3.connect('tasks.db') as db:
             cur = db.cursor()
-            cur.execute("SELECT Title, Deadline, Created, Status, Completed FROM Tasks")
+            cur.execute("SELECT Title, Created, Deadline, Status, Completed FROM Tasks")
             return cur.fetchall()
 
     @staticmethod

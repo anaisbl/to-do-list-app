@@ -86,18 +86,15 @@ class HomePage(QWidget):
 
         # current date & time label
         date_label = QLabel(f"Today is {current_date}.")
-        self.time_label = QLabel(f"It's currently {current_time} ")
+        self.time_label = QLabel(f"The time is {current_time} ")
         date_label.setStyleSheet("font-family: Indie Flower; font-weight: 400; font-size: 28px; color: rgb(90, 53, 88);")
         self.time_label.setStyleSheet("font-family: Indie Flower; font-weight: 400; font-size: 28px; color: rgb(90, 53, 88);")
         self.update_time()
 
         # current weather (initially empty) -- wip
-        # self.weather_label = QLabel("Click here to set your city for weather info!")
-        # self.weather_label.setStyleSheet("font-size: 16px; color: #555; text-decoration: underline; cursor: pointer;")
-        # self.weather_label.mousePressEvent = self.prompt_city_input  # Attach click event
-
-        # add labels to a vertical layout
-        # greeting_layout.addWidget(self.weather_label, alignment=Qt.AlignRight) - wip
+        # self.weather_label = QPushButton("Click here to set your city for weather info!")
+        # self.weather_label.setProperty("button", True)
+        # self.weather_label.mousePressEvent = self.prompt_city_input  # attach click event
         
         # history button
         self.hist_button = QPushButton()
@@ -120,18 +117,19 @@ class HomePage(QWidget):
         button_layout.addWidget(self.hist_button, alignment=Qt.AlignRight)
         button_layout.addWidget(self.add_task_button, alignment=Qt.AlignRight)
 
-        # Horizontal layout for top-row alignment
+        # horizontal layout for top-row alignment
         top_layout = QHBoxLayout()
         top_layout.addWidget(greeting_label, alignment=Qt.AlignLeft)
         top_layout.addLayout(button_layout)
 
-        # Vertical layout for the whole section
+        # vertical layout for the whole section
         main_layout = QVBoxLayout()
         main_layout.addLayout(top_layout)
         main_layout.addWidget(date_label, alignment=Qt.AlignLeft)
         main_layout.addWidget(self.time_label, alignment=Qt.AlignLeft)
+        # main_layout.addWidget(self.weather_label, alignment=Qt.AlignLeft)
 
-        # Wrap in a QWidget and add to main layout
+        # wrap in a QWidget and add to main layout
         greeting_widget = QWidget()
         greeting_widget.setLayout(main_layout)
         self.layout.addWidget(greeting_widget)
@@ -144,7 +142,7 @@ class HomePage(QWidget):
     def update_time(self):
         """Update the time label with the current time."""
         current_time = datetime.now().strftime("%H : %M : %S")  # get the current time
-        self.time_label.setText(f"It's currently {current_time}")
+        self.time_label.setText(f"The time is {current_time}")
 
     def open_history_window(self):
         """Open the history window."""
@@ -405,7 +403,7 @@ class HistoryWindow(QWidget):
         self.setLayout(self.layout)
 
         # populate table
-        self.grab_all_tasks()
+        self.display_all_tasks()
 
     def top_filter_section(self):
         """Create a top section with filters to rowse through all tasks ever created."""
@@ -415,14 +413,35 @@ class HistoryWindow(QWidget):
         intro_label.setStyleSheet("font-family: Indie Flower; font-size: 30px; font-weight: 800; color: rgb(93, 28, 90);")
 
         # filters
+        self.all_tasks_button = QPushButton("View all tasks")
+        self.all_tasks_button.setProperty("button", True)
+        self.all_tasks_button.setToolTip("Sort pending tasks")
+        self.all_tasks_button.clicked.connect(self.display_all_tasks)
+
+        self.pending_task_button = QPushButton("View pending tasks")
+        self.pending_task_button.setProperty("button", True)
+        self.pending_task_button.setToolTip("Sort pending tasks")
+        self.pending_task_button.clicked.connect(self.pending_task_filter)
+
+        self.date_asc_button = QPushButton("Sort by date due (asc)")
+        self.date_asc_button.setProperty("button", True)
+        self.date_asc_button.setToolTip("Sort ealiest to latest due")
+        self.date_asc_button.clicked.connect(self.date_asc_filter)
+
+        filter_button_layout = QHBoxLayout()
+        filter_button_layout.addWidget(self.all_tasks_button, alignment=Qt.AlignLeft)
+        filter_button_layout.addWidget(self.pending_task_button, alignment=Qt.AlignLeft)
+        filter_button_layout.addWidget(self.date_asc_button, alignment=Qt.AlignLeft)
 
         # add to layout
         self.layout.addWidget(intro_label)
+        self.layout.addLayout(filter_button_layout)
     
-    def grab_all_tasks(self):
-        """Populate the history task table"""
+    def display_all_tasks(self):
+        """Display all tasks in the history task table"""
         self.history_table.setRowCount(0)  # clear the table to avoid dups
         row_counter = 0
+        all_tasks = False #flag to check for tasks
 
         #word wrap
         self.history_table.setWordWrap(True)
@@ -431,6 +450,7 @@ class HistoryWindow(QWidget):
         tasks = DbInteraction.grab_all_history()
 
         for task in tasks:
+            all_tasks = True
             title, creation, deadline, status, completed = task
 
             # add task title
@@ -464,6 +484,145 @@ class HistoryWindow(QWidget):
             
         # Resize rows to fit wrapped text
         self.history_table.resizeRowsToContents()
+
+        if not all_tasks:
+            self.no_task_dialog("No tasks in history!")
+    
+    def pending_task_filter(self):
+        """Filter out tasks that are pending in the history task table"""
+        self.history_table.setRowCount(0)  # clear the table to avoid dups
+        row_counter = 0
+        pending_tasks = False # flag to check for pending tasks
+
+        #word wrap
+        self.history_table.setWordWrap(True)
+
+        # retrieve tasks
+        tasks = DbInteraction.grab_all_history()
+
+        for task in tasks:
+            title, creation, deadline, status, completed = task
+
+            if status == "Pending":
+                pending_tasks = True
+
+                # add task title
+                task_item = QTableWidgetItem(title)
+                task_item.setTextAlignment(Qt.AlignLeft | Qt.AlignCenter)
+                self.history_table.insertRow(row_counter)
+                self.history_table.setItem(row_counter, 0, task_item)
+
+                # add task creation
+                task_creation_item = QTableWidgetItem(creation)
+                task_creation_item.setTextAlignment(Qt.AlignCenter)
+                self.history_table.setItem(row_counter, 1, task_creation_item)
+
+                # add deadline
+                deadline_item = QTableWidgetItem(deadline)
+                deadline_item.setTextAlignment(Qt.AlignCenter)
+                self.history_table.setItem(row_counter, 2, deadline_item)
+
+                # add status
+                status_item = QTableWidgetItem(status)
+                status_item.setTextAlignment(Qt.AlignCenter)
+                self.history_table.setItem(row_counter, 3, status_item)
+
+                # add completion date
+                completion_item = QTableWidgetItem(completed)
+                completion_item.setTextAlignment(Qt.AlignCenter)
+                self.history_table.setItem(row_counter, 4, completion_item)
+
+                # increment the visible row index
+                row_counter += 1
+                
+        # resize rows to fit wrapped text
+        self.history_table.resizeRowsToContents()
+        
+        if not pending_tasks:
+            self.no_task_dialog("No pending tasks!")
+    
+    def date_asc_filter(self):
+        """Sort tasks ascending by status, earliest due date on top in the history task table"""
+        self.history_table.setRowCount(0)  # clear the table to avoid dups
+        row_counter = 0
+        all_tasks = False # flag to check for pending tasks
+
+        #word wrap
+        self.history_table.setWordWrap(True)
+
+        # retrieve tasks
+        tasks = DbInteraction.grab_all_history()
+
+        # convert deadline to datetime objects for sorting
+        sorted_tasks = []
+        for task in tasks:
+            title, creation, deadline, status, completed = task
+            try:
+                deadline_date = datetime.strptime(deadline, "%d-%m-%y")
+            except ValueError:
+                # account for "no deadline"
+                deadline_date = None
+
+            sorted_tasks.append((deadline_date, title, creation, deadline, status, completed))
+
+        # sort tasks by the parsed datetime object (earliest first)
+        sorted_tasks.sort(key=lambda task: (task[0] is None, task[0] or datetime.max))
+        print(sorted_tasks)
+
+        for deadline_date, title, creation, deadline, status, completed in sorted_tasks:
+
+            if deadline_date != None:
+                all_tasks = True
+
+                # add task title
+                task_item = QTableWidgetItem(title)
+                task_item.setTextAlignment(Qt.AlignLeft | Qt.AlignCenter)
+                self.history_table.insertRow(row_counter)
+                self.history_table.setItem(row_counter, 0, task_item)
+
+                # add task creation
+                task_creation_item = QTableWidgetItem(creation)
+                task_creation_item.setTextAlignment(Qt.AlignCenter)
+                self.history_table.setItem(row_counter, 1, task_creation_item)
+
+                # add deadline
+                if deadline_date is not None:
+                    formatted_deadline = deadline_date.strftime("%d-%m-%y")
+                else:
+                    formatted_deadline = deadline
+                deadline_item = QTableWidgetItem(formatted_deadline)
+                deadline_item.setTextAlignment(Qt.AlignCenter)
+                self.history_table.setItem(row_counter, 2, deadline_item)
+
+                # add status
+                status_item = QTableWidgetItem(status)
+                status_item.setTextAlignment(Qt.AlignCenter)
+                self.history_table.setItem(row_counter, 3, status_item)
+
+                # add completion date
+                completion_item = QTableWidgetItem(completed)
+                completion_item.setTextAlignment(Qt.AlignCenter)
+                self.history_table.setItem(row_counter, 4, completion_item)
+
+                # increment the visible row index
+                row_counter += 1
+
+        # resize rows to fit wrapped text
+        self.history_table.resizeRowsToContents()
+        
+        if not all_tasks:
+            self.no_task_dialog("No tasks in history!")
+    
+    def no_task_dialog(self, message):
+        """Dialog box for when the filter buttons return nothing"""
+        dlg = QMessageBox(self)
+        dlg.setWindowTitle("Task History")
+        dlg.setText(message)
+        dlg.setIcon(QMessageBox.Information)
+        button = dlg.exec()
+        if button == QMessageBox.Ok:
+            print("OK!")
+
 
 # Qapplication instance
 # passing sys.argv argument to allow CL arguments for the app
