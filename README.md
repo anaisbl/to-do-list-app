@@ -7,8 +7,8 @@ Welcome to the repo where I am learning PyQT5 while building a To-Do list applic
 
 ### Features:
 - **Add/Modify/Complete/Delete tasks**: The basis of any to do lists, you need to be able to create those tasks and tick them off! 📑
-- **SQLite DB**: kind of essential for an offline app 
-- **Reminders**: I want some tasks to have deadlines or reminders that will pop up ⏰
+- **SQLite DB**: For data storage :🏭 
+- **Reminders**: Overdue tasks ⏰ change color to red to stress you out a little bit!
 - **History**: Panel to view all tasks ever created + some filters for easy viewing 🙂
 
 ### What I'm working on:
