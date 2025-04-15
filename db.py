@@ -1,22 +1,28 @@
 import sqlite3
+from utils import get_db_path
+
+db_path = get_db_path()
 
 class DbInteraction:
     # static methods don't rely on instance attr, they only interact with the db
     @staticmethod
     def create_table():
         """Sets up tables for new database"""
-        db = sqlite3.connect('tasks.db')
-        cur = db.cursor()
-        cur.execute("""CREATE TABLE IF NOT EXISTS Tasks (
-                TaskID INTEGER PRIMARY KEY AUTOINCREMENT, Title TEXT NOT NULL, Deadline TEXT, Created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, Status TEXT, Completed TIMESTAMP                         
-            );""")
-        
-        db.close()
+        try:
+            db = sqlite3.connect(db_path)
+            cur = db.cursor()
+            cur.execute("""CREATE TABLE IF NOT EXISTS Tasks (
+                    TaskID INTEGER PRIMARY KEY AUTOINCREMENT, Title TEXT NOT NULL, Deadline TEXT, Created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, Status TEXT, Completed TIMESTAMP                         
+                );""")
+            
+            db.close()
+        except sqlite3.OperationalError as e:
+             print(f"Database error: {e}")
     
     @staticmethod
     def save_task(title, deadline, status="Pending", completed=""):
         """Save a task into the database."""
-        with sqlite3.connect('tasks.db') as db:
+        with sqlite3.connect(db_path) as db:
             cur = db.cursor()
             cur.execute(
                 """INSERT INTO Tasks (Title, Deadline, Status, Completed) 
@@ -28,7 +34,7 @@ class DbInteraction:
     @staticmethod
     def fetch_tasks():
         """Fetch all tasks, 4 cols from the database."""
-        with sqlite3.connect('tasks.db') as db:
+        with sqlite3.connect(db_path) as db:
             cur = db.cursor()
             cur.execute("SELECT Title, Deadline, Status, Completed FROM Tasks")
             return cur.fetchall()
@@ -36,7 +42,7 @@ class DbInteraction:
     @staticmethod
     def grab_all_history():
          """"Fetch all tasks, all cols from db for the history view"""
-         with sqlite3.connect('tasks.db') as db:
+         with sqlite3.connect(db_path) as db:
             cur = db.cursor()
             cur.execute("SELECT Title, Created, Deadline, Status, Completed FROM Tasks")
             return cur.fetchall()
@@ -44,7 +50,7 @@ class DbInteraction:
     @staticmethod
     def delete_task(title, deadline):
         """Delete a task from the database."""
-        with sqlite3.connect('tasks.db') as db:
+        with sqlite3.connect(db_path) as db:
             cur = db.cursor()
             cur.execute("DELETE FROM Tasks WHERE Title = ? AND Deadline = ?", (title, deadline))
             db.commit()
@@ -52,7 +58,7 @@ class DbInteraction:
     @staticmethod
     def update_task_status(title, deadline, status, completed):
         """Update completion status of task"""
-        with sqlite3.connect('tasks.db') as db:
+        with sqlite3.connect(db_path) as db:
             cursor = db.cursor()
             cursor.execute(
                 """UPDATE Tasks 
@@ -63,7 +69,7 @@ class DbInteraction:
             db.commit()
     @staticmethod
     def update_task(new_title, new_deadline, title, deadline):
-        with sqlite3.connect('tasks.db') as db:
+        with sqlite3.connect(db_path) as db:
                 cursor = db.cursor()
                 cursor.execute(
                     """UPDATE Tasks 
@@ -74,7 +80,7 @@ class DbInteraction:
                 db.commit()
     @staticmethod
     def delete_task(title, deadline):
-        with sqlite3.connect('tasks.db') as db:
+        with sqlite3.connect(db_path) as db:
                 cursor = db.cursor()
                 cursor.execute("DELETE FROM Tasks WHERE Title = ? AND Deadline = ?", (title, deadline))
                 db.commit()

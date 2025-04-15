@@ -3,8 +3,8 @@
 /* main window bg */
 QMainWindow#MainWindow {
     background-color:rgb(251, 242, 234);
-    background-image: url("assets/bg.jpg");
     background-position: center;
+    background-image: url("assets/bg.jpg")
 }
 
 /* all buttons */
@@ -76,7 +76,7 @@ QHeaderView {
 /* new task form */
 QWidget#TaskCreationWindow {
     background-color:rgb(251, 242, 234);
-    background-image: url("assets/bg.jpg");
+    /* background-image: url("assets/bg.jpg"); not supported for QWidget */
     background-position: center;
 }
 QTextEdit {
@@ -93,7 +93,7 @@ QTextEdit {
 /* history page */
 QWidget#HistoryWindow {
     background-color:rgb(251, 242, 234);
-    background-image: url("assets/bg.jpg");
+    /* background-image: url("assets/bg.jpg"); not supported for QWidget */
     background-position: center;
 }
 QTableWidget#HistoryWindow {

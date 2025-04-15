@@ -1,10 +1,12 @@
 import sys
+import os
 import getpass
 from datetime import datetime
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFontDatabase, QBrush, QColor
 from PyQt5.QtCore import Qt, QDateTime, QTimer, QSize
 from db import DbInteraction
+from utils import get_resource_path
 
 ###_________ NOTES ___________###
 # core of every Qt app is the QApplication class
@@ -21,18 +23,15 @@ class toDoApp(QMainWindow):
         super().__init__()
         self.setObjectName("MainWindow")
 
-        # Initialize the database
+        # initialize the database
         DbInteraction.create_table()
-        
-        # stylesheet
-        self.load_stylesheet("style.qss")
 
         # add font to font db
-        font_path = "assets/font/IndieFlower-Regular.ttf"
+        font_path = get_resource_path("assets/font/IndieFlower-Regular.ttf")
         QFontDatabase.addApplicationFont(font_path)
 
         # window size + title
-        self.setWindowTitle("Cute To-do list")
+        self.setWindowTitle("My To-do list")
         self.setGeometry(80, 80, 680, 650)
 
         # create homepage
@@ -44,11 +43,6 @@ class toDoApp(QMainWindow):
         central_widget = QWidget()
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
-
-    # load stylesheet
-    def load_stylesheet(self, filename):
-        with open(filename, "r") as file:
-            QApplication.instance().setStyleSheet(file.read())
 
 class HomePage(QWidget):
     def __init__(self):
@@ -100,16 +94,18 @@ class HomePage(QWidget):
         # self.weather_label.mousePressEvent = self.prompt_city_input  # attach click event
         
         # history button
+        hist_icon_path = get_resource_path("assets/icons8-history-folder-64.png")
         self.hist_button = QPushButton()
-        self.hist_button.setIcon(QIcon("assets/icons8-history-folder-64.png"))
+        self.hist_button.setIcon(QIcon(hist_icon_path))
         self.hist_button.setIconSize(QSize(40, 40))
         self.hist_button.setProperty("button", False)
         self.hist_button.setToolTip("History")
         self.hist_button.clicked.connect(self.open_history_window)
 
         # new task button
+        add_task_icon_path = get_resource_path("assets/icons8-plus-sign-50.png")
         self.add_task_button = QPushButton()
-        self.add_task_button.setIcon(QIcon("assets/icons8-plus-sign-50.png"))
+        self.add_task_button.setIcon(QIcon(add_task_icon_path))
         self.add_task_button.setIconSize(QSize(40, 40))
         self.add_task_button.setProperty("button", False)
         self.add_task_button.setToolTip("Add task")
@@ -161,6 +157,10 @@ class HomePage(QWidget):
 
     def refresh_task_list(self):
         """Refresh the task table, handle status changes, and exclude completed tasks."""
+        # icon links
+        edit_icon_path = get_resource_path("assets/icons8-edit-64.png")
+        delete_icon_path = get_resource_path("assets/icons8-trash-can-64.png")
+        
         self.task_table.setRowCount(0)  # clear the table to avoid dups
         row_counter = 0
 
@@ -200,13 +200,13 @@ class HomePage(QWidget):
 
                 # add modify + delete buttons
                 modify_button = QPushButton()
-                modify_button.setIcon(QIcon("assets/icons8-edit-64.png"))
+                modify_button.setIcon(QIcon(edit_icon_path))
                 modify_button.clicked.connect(lambda _, row=row_counter: self.modify_task(row))
                 modify_button.setProperty("button", False)
                 modify_button.setToolTip("Edit task")
 
                 delete_button = QPushButton()
-                delete_button.setIcon(QIcon("assets/icons8-trash-can-64.png"))
+                delete_button.setIcon(QIcon(delete_icon_path))
                 delete_button.clicked.connect(lambda _, row=row_counter: self.delete_task(row))
                 delete_button.setProperty("button", False)
                 delete_button.setToolTip("Delete task")
@@ -649,12 +649,26 @@ class HistoryWindow(QWidget):
         if button == QMessageBox.Ok:
             print("OK!")
 
-
+# load stylesheet
+def load_stylesheet():
+    """Load QSS file stylesheet, replace bg image with placeholder"""
+    style_path = get_resource_path("style.qss")
+    bg_path = get_resource_path("assets/bg.jpg")
+    try:
+        with open(style_path, "r") as file:
+            stylesheet = file.read()
+            stylesheet = stylesheet.replace("assets/bg.png", bg_path)
+        return stylesheet
+    except FileNotFoundError:
+        print("Stylesheet file or image not found!")
+        return ""
+    
 # Qapplication instance
 # passing sys.argv argument to allow CL arguments for the app
 app = QApplication(sys.argv)
+app.setStyleSheet(load_stylesheet())
 
-# create Qtwidget which is our window
+# create our window
 window = toDoApp()
 window.show()   # because windows are hidden by default
 
