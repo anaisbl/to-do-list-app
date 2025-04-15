@@ -5,6 +5,11 @@ Welcome to the repo where I am learning PyQT5 while building a To-Do list applic
 ### Goal:
 - To create a cute, easy to to use tool for task creation, completion and reminders!
 
+### Screenshots:
+<img src="https://github.com/user-attachments/assets/2106c35c-6aac-4c57-bcb2-cb8ff250baad" width="400" height="400">
+<img src="https://github.com/user-attachments/assets/238bdb2d-42c8-4550-b6ff-87a573bd12e8" width="400" height="400">
+<img src="https://github.com/user-attachments/assets/f36d086a-983f-40ec-9d98-f3d08ca0c3a4" width="500" height="400">
+
 ### Features:
 - **Add/Modify/Complete/Delete tasks**: The basis of any to do lists, you need to be able to create those tasks and tick them off! 📑
 - **SQLite DB**: For data storage :🏭 
